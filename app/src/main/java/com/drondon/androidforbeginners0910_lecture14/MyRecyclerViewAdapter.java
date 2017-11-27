@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by collos on 11/22/17.
  */
@@ -15,25 +17,34 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     private OnItemClickListener itemClickListener;
 
+    List<Coin> coinList;
+
+    public MyRecyclerViewAdapter(List<Coin> coinList) {
+        this.coinList = coinList;
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_info, parent, false));
+        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_info, parent, false);
+        return new MyViewHolder(inflate);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        // TODO: 11/22/17
-        holder.tvSymbol.setText("");
-        holder.tvName.setText("");
-        holder.tvRank.setText("");
-        holder.tvPriceUsd.setText("");
-        holder.tvPriceBtc.setText("");
+
+        Coin coin = coinList.get(position);
+
+        holder.tvSymbol.setText(coin.getSymbol());
+        holder.tvName.setText(coin.getName());
+        holder.tvRank.setText(coin.getRank());
+        holder.tvPriceUsd.setText(coin.getPriceUsd());
+        holder.tvPriceBtc.setText(coin.getPriceBtc());
+
     }
 
     @Override
     public int getItemCount() {
-        // TODO: 11/22/17
-        return 0;
+        return coinList.size();
     }
 
     public void setItemClickListener(@Nullable OnItemClickListener itemClickListener) {
