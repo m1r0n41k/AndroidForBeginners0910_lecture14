@@ -40,6 +40,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         holder.tvPriceUsd.setText(coin.getPriceUsd());
         holder.tvPriceBtc.setText(coin.getPriceBtc());
 
+        holder.cardView.setTag(coin);
+
     }
 
     @Override
@@ -73,7 +75,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         @Override
         public void onClick(View v) {
             if (itemClickListener != null) {
-                itemClickListener.onItemClicked((View) v.getParent(), getAdapterPosition());
+                itemClickListener.onItemClicked(v, getAdapterPosition());
             }
         }
     }

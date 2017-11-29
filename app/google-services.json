@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "663336320253",
+    "firebase_url": "https://android-for-begginners.firebaseio.com",
+    "project_id": "android-for-begginners",
+    "storage_bucket": "android-for-begginners.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663336320253:android:a14f30f9432e20af",
+        "android_client_info": {
+          "package_name": "com.drondon.androidforbeginners0910_lecture14"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663336320253-ls272q014po36meka2gs4asolbickmdg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.drondon.androidforbeginners0910_lecture14",
+            "certificate_hash": "630cdf2cbe520d9bb5700f535ad81ed1ffc98f49"
+          }
+        },
+        {
+          "client_id": "663336320253-b9f46apgiv7bnak29iq3a55u5bd2spn5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLb57p1RLMK_BIEuCUB55RPU2ggxThegw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663336320253-b9f46apgiv7bnak29iq3a55u5bd2spn5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
