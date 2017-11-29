@@ -6,14 +6,19 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -26,9 +31,13 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "MainActivity_";
+
     RecyclerView recyclerView;
+    SwipeRefreshLayout swipeRefreshLayout;
     Button updateButton;
     MyRecyclerViewAdapter adapter;
+
     List<Coin> coinList = new ArrayList<>();
 
     @Override
@@ -37,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recycler_view);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
 
         adapter = new MyRecyclerViewAdapter(coinList);
 
@@ -51,17 +61,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Обновляем информацию по swipe вниз
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateData();
+            }
+        });
+
         updateButton = findViewById(R.id.button);
         updateButton.setOnClickListener(this);
 
-        boolean showBuyNowButton = FirebaseRemoteConfig.getInstance().getBoolean("show_buy_now", "true");
+        refreshConfig();
 
-        updateButton.setVisibility(showBuyNowButton ? View.VISIBLE : View.GONE);
+        updateData();
     }
 
     @Override
     public void onClick(View v) {
+        updateData();
+    }
 
+    private void updateData() {
         Call<List<Coin>> call = API.get().getCoins(0, 20);
         call.enqueue(new Callback<List<Coin>>() {
             @Override
@@ -70,16 +91,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     List<Coin> coins = response.body();
                     coinList.clear();
                     coinList.addAll(coins);
-                    adapter.notifyItemRangeInserted(0, coins.size());
+                    adapter.notifyItemRangeChanged(0, coins.size());
                 }
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<List<Coin>> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
-
     }
 
     @Override
@@ -111,10 +133,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setContentIntent(pendingIntent)       //Клик на уведомление
                 .build();
 
-//Запуск уведомления
+        //Запуск уведомления
         notificationManager.notify(1, notification);
 
+    }
 
+
+    private void refreshConfig() {
+        final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+
+        remoteConfig.fetch().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                boolean showBuyNowButton = remoteConfig.getBoolean("show_buy_now");
+                Log.d(TAG, "onComplete: showBuyNowButton: " + showBuyNowButton);
+                updateButton.setVisibility(showBuyNowButton ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
 }
