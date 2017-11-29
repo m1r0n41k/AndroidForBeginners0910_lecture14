@@ -32,7 +32,7 @@ public class API {
                     .addInterceptor(new OfflineResponseCacheInterceptor())
                     // Set the cache location and size (5 MB)
                     .cache(new Cache(new File(App.get().getCacheDir(),
-                            "apiResponses"), 5 * 1024 * 1024))
+                            "api"), 5 * 1024 * 1024))
                     .build();
 
             Retrofit retrofit = new Retrofit.Builder()

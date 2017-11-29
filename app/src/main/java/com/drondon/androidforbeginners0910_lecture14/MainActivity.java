@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateData() {
-        Call<List<Coin>> call = API.get().getCoins(0, 20);
+        Call<List<Coin>> call = API.get().getCoins(0, 50);
         call.enqueue(new Callback<List<Coin>>() {
             @Override
             public void onResponse(Call<List<Coin>> call, Response<List<Coin>> response) {
