@@ -1,5 +1,10 @@
 package com.drondon.androidforbeginners0910_lecture14;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,15 +13,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.gelitenight.waveview.library.WaveView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -54,7 +64,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClicked(View view, int position) {
                 Coin coin = (Coin) view.getTag();
-                FirebaseMessaging.getInstance().subscribeToTopic(coin.getName());
+                FirebaseMessaging.getInstance().subscribeToTopic(coin.getName().replace(" ", ""));
+                final CoinView coinView = findViewById(R.id.last_coin);
+                coinView.setVisibility(View.INVISIBLE);
+                coinView.setCoin(coin);
+                coinView.post(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      showLastSelectedWithAnimation(coinView);
+                                  }
+                              }
+                );
             }
         });
 
@@ -75,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         refreshConfig();
 
         updateData();
+
+
     }
 
     @Override
@@ -102,6 +124,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        final WaveView waveView = findViewById(R.id.wave);
+        waveView.post(new Runnable() {
+            @Override
+            public void run() {
+                waveView.setShapeType(WaveView.ShapeType.SQUARE);
+                int color1 = ContextCompat.getColor(waveView.getContext(), R.color.colorPrimaryDarkTransp);
+                int color = ContextCompat.getColor(waveView.getContext(), R.color.colorPrimaryTransp);
+                waveView.setWaveColor(color, color1);
+                waveView.setShowWave(true);
+                //
+                waveView.setWaterLevelRatio(0.75f);
+                AnimatorSet set = new AnimatorSet();
+                // horizontal animation.
+                // wave waves infinitely.
+                ObjectAnimator waveShiftAnim = ObjectAnimator.ofFloat(
+                        waveView, "waveShiftRatio", 0f, 1f);
+                waveShiftAnim.setRepeatCount(ValueAnimator.INFINITE);
+                waveShiftAnim.setDuration(2000);
+                waveShiftAnim.setInterpolator(new LinearInterpolator());
+
+
+                // amplitude animation.
+                // wave grows big then grows small, repeatedly
+                ObjectAnimator amplitudeAnim = ObjectAnimator.ofFloat(
+                        waveView, "amplitudeRatio", .01f, .08f);
+                amplitudeAnim.setRepeatCount(ValueAnimator.INFINITE);
+                amplitudeAnim.setRepeatMode(ValueAnimator.REVERSE);
+                amplitudeAnim.setDuration(1000);
+                amplitudeAnim.setInterpolator(new LinearInterpolator());
+
+                // vertical animation.
+                // water level increases from 0 to center of WaveView
+                ObjectAnimator waterLevelAnim = ObjectAnimator.ofFloat(
+                        waveView, "waterLevelRatio", 0.75f, 0.9f);
+                waterLevelAnim.setDuration(9000);
+                waterLevelAnim.setRepeatCount(ValueAnimator.INFINITE);
+                waterLevelAnim.setRepeatMode(ValueAnimator.REVERSE);
+                waterLevelAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+
+                set.playTogether(waveShiftAnim, amplitudeAnim, waterLevelAnim);
+                set.start();
+            }
+        });
+
     }
 
     @Override
@@ -150,6 +221,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 updateButton.setVisibility(showBuyNowButton ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    private void showLastSelectedWithAnimation(final CoinView coinView) {
+        Animator animator = ObjectAnimator.ofFloat(coinView, "x", -coinView.getWidth(), 0);
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                coinView.setVisibility(View.VISIBLE);
+            }
+        });
+        animator.setInterpolator(new AccelerateInterpolator());
+        animator.setDuration(300)
+                .start();
     }
 
 }

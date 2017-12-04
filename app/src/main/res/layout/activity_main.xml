@@ -27,6 +27,7 @@
             android:layout_marginTop="8dp"
             android:clipToPadding="false"
             android:paddingBottom="72dp"
+            android:paddingTop="160dp"
 
             tools:listitem="@layout/item_main_info" />
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -42,4 +43,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.gelitenight.waveview.library.WaveView
+        android:id="@+id/wave"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:rotation="180"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <com.drondon.androidforbeginners0910_lecture14.CoinView
+        android:id="@+id/last_coin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+
 </android.support.constraint.ConstraintLayout>
